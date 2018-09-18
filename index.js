@@ -25,7 +25,6 @@ function getWeather(location) {
     .then(body => {
         // get weather description
         const locationWeather = body.weather[0].description.split(" ").join("+");
-        console.log({body})
         getPhotos(location, locationWeather);
     })
 }
