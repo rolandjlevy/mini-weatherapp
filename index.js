@@ -37,10 +37,10 @@ function getPhotos (location, locationWeather) {
         firstPhoto.src = body.results[0].urls.regular;
         console.log(firstPhoto.innerHTML)
         mainPhotoContainer.appendChild(firstPhoto);
-        let hmtlOutput = "<ul>";
+        let hmtlOutput = `<ul class="thumbs">`
         body.results.forEach(result => {
             // console.log(result.urls.regular)
-            hmtlOutput += `<li><img src="${result.urls.thumb}"></li>`;
+            hmtlOutput += `<li class="thumb"><img  src="${result.urls.thumb}"></li>`;
         });
         // sconsole.log(hmtlOutput + "</ul>")
         thumbContainer.innerHTML = hmtlOutput + "</ul>";
