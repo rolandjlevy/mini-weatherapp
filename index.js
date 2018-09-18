@@ -48,11 +48,13 @@ function getPhotos(location, locationWeather) {
 //     });
 //     console.log({creditArray});
 // }
-
+const credit = document.querySelector("#credit-user");
 function loadFirstPhoto (resultsArray) {
     const firstPhoto = createElement("img");
     firstPhoto.src = resultsArray[0].urls.regular;
     mainPhotoContainer.appendChild(firstPhoto);
+    credit.innerHTML = `${resultsArray[0].user.first_name} ${resultsArray[0].user.last_name}`;
+        
 }
 
 function renderThumbs (resultsArray) {
@@ -66,7 +68,7 @@ function renderThumbs (resultsArray) {
 
 function createThumbLinks(resultsArray){
     const thumbLinks = document.querySelectorAll(".thumb");
-    const credit = document.querySelector("#credit-user");
+   
     let counter = 0;
     thumbLinks.forEach(thumbImage => {
         let name = `${resultsArray[counter].user.first_name} ${resultsArray[counter].user.last_name}`;
