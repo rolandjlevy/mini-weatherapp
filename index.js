@@ -18,8 +18,6 @@ form.addEventListener("submit", function (event) {
 })
 
 
-
-
 // main function that fetches weather data
 function getWeather(location) {
     // location is from user input(form event listener above)
@@ -31,10 +29,6 @@ function getWeather(location) {
             getPhotos(location, locationWeather);
         })
 }
-//
-
-
-
 
 function getPhotos(location, locationWeather) {
     const url = `https://api.unsplash.com/search/photos?query=${location}+${locationWeather}&client_id=${client_id}`;
@@ -43,18 +37,16 @@ function getPhotos(location, locationWeather) {
         .then(body => {
             //clear mainContainer node/selector
             mainPhotoContainer.innerHTML = "";
-            loadFirstPhoto(body.results, locationWeather);
+            loadFirstPhoto(body.results, location, locationWeather);
             renderThumbs(body.results);
             createThumbLinks(body.results);
         });
 }
 
-
-
-function loadFirstPhoto(resultsArray, locationWeather) {
+function loadFirstPhoto(resultsArray, location, locationWeather) {
     mainPhotoContainer.innerHTML = `<img src="${resultsArray[0].urls.regular}">`;
     credit.innerHTML = `${resultsArray[0].user.first_name} ${resultsArray[0].user.last_name}`;
-    weatherDescription.innerHTML = `${locationWeather.split("+").join(" ")}`;
+    weatherDescription.innerHTML = `WEATHER IN ${location}: ${locationWeather.split("+").join(" ")}`;
 }
 
 //creating the thumbnail images
@@ -70,26 +62,24 @@ function renderThumbs(resultsArray) {
 function createThumbLinks(resultsArray) {
     const thumbLinks = document.querySelectorAll(".thumb");
     thumbLinks.forEach((thumbImage, counter) => {
+        // make this into a function you can use instead of loadFirstPhoto
         let name = `${resultsArray[counter].user.first_name} ${resultsArray[counter].user.last_name}`;
         thumbImage.name = name;
+        let creditName = resultsArray[counter].user.links.html;
+        thumbImage.longDesc = creditName;
         thumbImage.addEventListener("click", function (event) {
             mainPhotoContainer.innerHTML = `<img src="${event.target.currentSrc}">`;
-            credit.innerHTML = `<a>${thumbImage.name}</a>`;
-            const prevThumb = document.querySelector(".active");
-            if (prevThumb !== null) {
-                prevThumb.classList.remove("active")
-                event.target.classList.add("active")
-            }
+            credit.innerHTML = `<a href="${thumbImage.longDesc}" target="_blank">${thumbImage.name}</a>`;
+            setActiveButton(event);
         })
     })
 }
 
-function appendChild(parent, element) {
-    return parent.appendChild(element)
+function setActiveButton (event){
+    const prevThumb = document.querySelector(".active");
+    if (prevThumb !== null) {
+        prevThumb.classList.remove("active")
+        event.target.classList.add("active")
+    }
 }
-
-function createElement(element) {
-    return document.createElement(element)
-}
-
 getWeather("italy");
