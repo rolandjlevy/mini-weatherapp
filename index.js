@@ -35,48 +35,48 @@ function getPhotos(location, locationWeather) {
         .then(body => {
             // createCreditsObject(body.results);
             mainPhotoContainer.innerHTML = "";
-            loadFirstPhoto(body.results);
+            loadFirstPhoto(body.results, locationWeather);
             renderThumbs(body.results);
             createThumbLinks(body.results);
         });
 }
 
-// function createCreditsObject(resultsArray) {
-//     const creditArray = []
-//     resultsArray.forEach(item => {
-//         creditArray.push(`${item.user.first_name} ${item.user.last_name}`);
-//     });
-//     console.log({creditArray});
-// }
+const weatherDescription = document.querySelector("#conditions")
 const credit = document.querySelector("#credit-user");
-function loadFirstPhoto (resultsArray) {
+
+function loadFirstPhoto(resultsArray, locationWeather) {
     const firstPhoto = createElement("img");
     firstPhoto.src = resultsArray[0].urls.regular;
     mainPhotoContainer.appendChild(firstPhoto);
     credit.innerHTML = `${resultsArray[0].user.first_name} ${resultsArray[0].user.last_name}`;
-        
+    weatherDescription.innerHTML = `${locationWeather.split("+").join(" ")}`;
 }
 
-function renderThumbs (resultsArray) {
+function renderThumbs(resultsArray) {
     let hmtlOutput = "";
-    resultsArray.forEach(result => {
-        hmtlOutput += `<div><img class="thumb" src="${result.urls.regular}"></div>`;
+    resultsArray.forEach((result, index) => {
+        let thumbClass = index === 0 ? `thumb active` : `thumb`;
+        hmtlOutput += `<div><img class="${thumbClass}" src="${result.urls.regular}"></div>`;
     });
     thumbContainer.innerHTML = hmtlOutput;
     const thumbLinks = document.querySelectorAll(".thumb")
 }
 
-function createThumbLinks(resultsArray){
+function createThumbLinks(resultsArray) {
+    console.log(resultsArray)
     const thumbLinks = document.querySelectorAll(".thumb");
-   
-    let counter = 0;
-    thumbLinks.forEach(thumbImage => {
+    thumbLinks.forEach((thumbImage, counter) => {
         let name = `${resultsArray[counter].user.first_name} ${resultsArray[counter].user.last_name}`;
-        counter++;
-        thumbImage.id = name;
-        thumbImage.addEventListener("mouseover", function(event){
+        thumbImage.id = resultsArray[counter].id;
+        thumbImage.name = name;
+        thumbImage.addEventListener("click", function (event) {
             mainPhotoContainer.innerHTML = `<img src="${event.target.currentSrc}">`;
-            credit.innerHTML = `<a>${thumbImage.id}</a>`;
+            credit.innerHTML = `<a>${thumbImage.name}</a>`;
+            const prevThumb = document.querySelector(".active");
+            if (prevThumb !== null) {
+                prevThumb.classList.remove("active")
+                event.target.classList.add("active")
+            }
         })
     })
 }
@@ -88,4 +88,3 @@ function appendChild(parent, element) {
 function createElement(element) {
     return document.createElement(element)
 }
-
