@@ -33,12 +33,21 @@ function getPhotos(location, locationWeather) {
     fetch(url)
         .then(response => response.json())
         .then(body => {
+            // createCreditsObject(body.results);
             mainPhotoContainer.innerHTML = "";
             loadFirstPhoto(body.results);
             renderThumbs(body.results);
             createThumbLinks(body.results);
         });
 }
+
+// function createCreditsObject(resultsArray) {
+//     const creditArray = []
+//     resultsArray.forEach(item => {
+//         creditArray.push(`${item.user.first_name} ${item.user.last_name}`);
+//     });
+//     console.log({creditArray});
+// }
 
 function loadFirstPhoto (resultsArray) {
     const firstPhoto = createElement("img");
@@ -56,14 +65,16 @@ function renderThumbs (resultsArray) {
 }
 
 function createThumbLinks(resultsArray){
-    console.log(resultsArray)
     const thumbLinks = document.querySelectorAll(".thumb");
     const credit = document.querySelector("#credit-user");
+    let counter = 0;
     thumbLinks.forEach(thumbImage => {
+        let name = `${resultsArray[counter].user.first_name} ${resultsArray[counter].user.last_name}`;
+        counter++;
+        thumbImage.id = name;
         thumbImage.addEventListener("mouseover", function(event){
             mainPhotoContainer.innerHTML = `<img src="${event.target.currentSrc}">`;
-            // console.log({event})
-            credit.innerHTML = `<a>test</a>`;
+            credit.innerHTML = `<a>${thumbImage.id}</a>`;
         })
     })
 }
