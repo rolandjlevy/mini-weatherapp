@@ -2,8 +2,8 @@
 //  Display white border around thumbnail of image currently displayed as main image using active class
 
 //Initialise API's and css selectors
-const weatherUrl = "84f0f2104760927b465acbf6cca0ab2f";
-const client_id = "b899d09e04d42d7c4a5d5f0a06b3e406f9bb09e388bf70dd2e69f296a43a887e";
+const weatherAPIKey = "84f0f2104760927b465acbf6cca0ab2f";
+const unsplashAPIKey = "b4574621f5145340d9c19e14e47c51c674c170b7b564908de5347e95916c8d08";
 const inputElement = document.querySelector(".search__input");
 const form = document.querySelector("form");
 const mainPhotoContainer = document.querySelector(".photo");
@@ -17,36 +17,30 @@ form.addEventListener("submit", function (event) {
     getWeather(inputElement.value);
 })
 
-
 // main function that fetches weather data
 function getWeather(location) {
     // location is from user input(form event listener above)
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${weatherUrl}`)
-        .then(response => response.json())
-        .then(body => {
-            // get weather description
-            const locationWeather = body.weather[0].description.split(" ").join("+");
-            getPhotos(location, locationWeather);
-        })
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${weatherAPIKey}`)
+    .then(response => response.json())
+    .then(body => {
+        // get weather description
+        const locationWeather = body.weather[0].description.split(" ").join("+");
+        console.log({body})
+        getPhotos(location, locationWeather);
+    })
 }
 
 function getPhotos(location, locationWeather) {
-    const url = `https://api.unsplash.com/search/photos?query=${location}+${locationWeather}&client_id=${client_id}`;
+    const url = `https://api.unsplash.com/search/photos?query=${location}+${locationWeather}&client_id=${unsplashAPIKey}`;
     fetch(url)
         .then(response => response.json())
         .then(body => {
             //clear mainContainer node/selector
             mainPhotoContainer.innerHTML = "";
-            loadFirstPhoto(body.results, location, locationWeather);
+            weatherDescription.innerHTML = `WEATHER IN ${location}: ${locationWeather.split("+").join(" ")}`;          
             renderThumbs(body.results);
             createThumbLinks(body.results);
         });
-}
-
-function loadFirstPhoto(resultsArray, location, locationWeather) {
-    mainPhotoContainer.innerHTML = `<img src="${resultsArray[0].urls.regular}">`;
-    credit.innerHTML = `${resultsArray[0].user.first_name} ${resultsArray[0].user.last_name}`;
-    weatherDescription.innerHTML = `WEATHER IN ${location}: ${locationWeather.split("+").join(" ")}`;
 }
 
 //creating the thumbnail images
@@ -54,7 +48,7 @@ function renderThumbs(resultsArray) {
     let hmtlOutput = "";
     resultsArray.forEach((result, index) => {
         let thumbClass = index === 0 ? `thumb active` : `thumb`;
-        hmtlOutput += `<div><img class="${thumbClass}" src="${result.urls.regular}"></div>`;
+        hmtlOutput += `<div><img class="${thumbClass}" src="${result.urls.regular}" title="${result.description}"></div>`;
     });
     thumbContainer.innerHTML = hmtlOutput;
 }
@@ -62,17 +56,16 @@ function renderThumbs(resultsArray) {
 function createThumbLinks(resultsArray) {
     const thumbLinks = document.querySelectorAll(".thumb");
     thumbLinks.forEach((thumbImage, counter) => {
-        // make this into a function you can use instead of loadFirstPhoto
-        let name = `${resultsArray[counter].user.first_name} ${resultsArray[counter].user.last_name}`;
-        thumbImage.name = name;
-        let creditName = resultsArray[counter].user.links.html;
-        thumbImage.longDesc = creditName;
+        let user = resultsArray[counter].user
+        thumbImage.name = `${user.first_name} ${user.last_name}`;
+        thumbImage.longDesc = user.links.html;
         thumbImage.addEventListener("click", function (event) {
-            mainPhotoContainer.innerHTML = `<img src="${event.target.currentSrc}">`;
+            mainPhotoContainer.innerHTML = `<img src="${event.target.src}">`;
             credit.innerHTML = `<a href="${thumbImage.longDesc}" target="_blank">${thumbImage.name}</a>`;
             setActiveButton(event);
         })
     })
+    thumbLinks[0].click();
 }
 
 function setActiveButton (event){
@@ -82,4 +75,5 @@ function setActiveButton (event){
         event.target.classList.add("active")
     }
 }
-getWeather("italy");
+inputElement.value = "Greece"
+getWeather(inputElement.value);
