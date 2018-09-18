@@ -1,12 +1,28 @@
 // Display photographer credits in bottom right hand corner with link to their portfolio on Unsplash
 //  Display white border around thumbnail of image currently displayed as main image using active class
 
+//Initialise API's and css selectors
 const weatherUrl = "84f0f2104760927b465acbf6cca0ab2f";
 const client_id = "b899d09e04d42d7c4a5d5f0a06b3e406f9bb09e388bf70dd2e69f296a43a887e";
+const inputElement = document.querySelector(".search__input");
+const form = document.querySelector("form");
+const mainPhotoContainer = document.querySelector(".photo");
+const thumbContainer = document.querySelector(".thumbs");
+const weatherDescription = document.querySelector("#conditions")
+const credit = document.querySelector("#credit-user");
+
+// listen out for input value from submitted form
+form.addEventListener("submit", function (event) {
+    event.preventDefault()
+    getWeather(inputElement.value);
+})
+
+
+
 
 // main function that fetches weather data
 function getWeather(location) {
-    // location is user input
+    // location is from user input(form event listener above)
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${weatherUrl}`)
         .then(response => response.json())
         .then(body => {
@@ -15,25 +31,17 @@ function getWeather(location) {
             getPhotos(location, locationWeather);
         })
 }
+//
 
-const inputElement = document.querySelector(".search__input");
-inputElement.value = "london";
-const form = document.querySelector("form");
-const mainPhotoContainer = document.querySelector(".photo");
-const thumbContainer = document.querySelector(".thumbs");
 
-// listen out for input value from submitted form
-form.addEventListener("submit", function (e) {
-    e.preventDefault()
-    getWeather(inputElement.value);
-})
+
 
 function getPhotos(location, locationWeather) {
     const url = `https://api.unsplash.com/search/photos?query=${location}+${locationWeather}&client_id=${client_id}`;
     fetch(url)
         .then(response => response.json())
         .then(body => {
-            // createCreditsObject(body.results);
+            //clear mainContainer node/selector
             mainPhotoContainer.innerHTML = "";
             loadFirstPhoto(body.results, locationWeather);
             renderThumbs(body.results);
@@ -41,17 +49,15 @@ function getPhotos(location, locationWeather) {
         });
 }
 
-const weatherDescription = document.querySelector("#conditions")
-const credit = document.querySelector("#credit-user");
+
 
 function loadFirstPhoto(resultsArray, locationWeather) {
-    const firstPhoto = createElement("img");
-    firstPhoto.src = resultsArray[0].urls.regular;
-    mainPhotoContainer.appendChild(firstPhoto);
+    mainPhotoContainer.innerHTML = `<img src="${resultsArray[0].urls.regular}">`;
     credit.innerHTML = `${resultsArray[0].user.first_name} ${resultsArray[0].user.last_name}`;
     weatherDescription.innerHTML = `${locationWeather.split("+").join(" ")}`;
 }
 
+//creating the thumbnail images
 function renderThumbs(resultsArray) {
     let hmtlOutput = "";
     resultsArray.forEach((result, index) => {
@@ -59,15 +65,12 @@ function renderThumbs(resultsArray) {
         hmtlOutput += `<div><img class="${thumbClass}" src="${result.urls.regular}"></div>`;
     });
     thumbContainer.innerHTML = hmtlOutput;
-    const thumbLinks = document.querySelectorAll(".thumb")
 }
 
 function createThumbLinks(resultsArray) {
-    console.log(resultsArray)
     const thumbLinks = document.querySelectorAll(".thumb");
     thumbLinks.forEach((thumbImage, counter) => {
         let name = `${resultsArray[counter].user.first_name} ${resultsArray[counter].user.last_name}`;
-        thumbImage.id = resultsArray[counter].id;
         thumbImage.name = name;
         thumbImage.addEventListener("click", function (event) {
             mainPhotoContainer.innerHTML = `<img src="${event.target.currentSrc}">`;
@@ -88,3 +91,5 @@ function appendChild(parent, element) {
 function createElement(element) {
     return document.createElement(element)
 }
+
+getWeather("italy");
