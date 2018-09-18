@@ -17,7 +17,7 @@ const inputElement = document.querySelector(".search__input");
 inputElement.value = "london"
 const form = document.querySelector("form");
 const mainPhotoContainer = document.querySelector(".photo");
-
+const thumbContainer = document.querySelector(".thumbs");
 // listen out for input value from submitted form
 form.addEventListener("submit",function(e){
     e.preventDefault()
@@ -25,9 +25,9 @@ form.addEventListener("submit",function(e){
 })
 
 function getPhotos (location, locationWeather) {
-    console.log(` The weather in ${location} is ${locationWeather} today`);
+    // console.log(` The weather in ${location} is ${locationWeather} today`);
     const url = `https://api.unsplash.com/search/photos?query=${location}+${locationWeather}&client_id=${client_id}`;
-    console.log(url);
+    // console.log(url);
     fetch(url)
     .then(response => response.json())
     .then(body => {
@@ -37,14 +37,13 @@ function getPhotos (location, locationWeather) {
         firstPhoto.src = body.results[0].urls.regular;
         console.log(firstPhoto.innerHTML)
         mainPhotoContainer.appendChild(firstPhoto);
-        
+        let hmtlOutput = "<ul>";
         body.results.forEach(result => {
-            // photo
-            
-            // console.log(firstPhoto.innerHTML)
-            
-          
+            // console.log(result.urls.regular)
+            hmtlOutput += `<li><img src="${result.urls.thumb}"></li>`;
         });
+        // sconsole.log(hmtlOutput + "</ul>")
+        thumbContainer.innerHTML = hmtlOutput + "</ul>";
     });
 }
 
