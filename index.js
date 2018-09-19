@@ -1,5 +1,4 @@
-// Display photographer credits in bottom right hand corner with link to their portfolio on Unsplash
-//  Display white border around thumbnail of image currently displayed as main image using active class
+// MINI WEATHER APP //
 
 //Initialise API's and css selectors
 const weatherAPIKey = "84f0f2104760927b465acbf6cca0ab2f";
@@ -7,6 +6,7 @@ const unsplashAPIKey = "b4574621f5145340d9c19e14e47c51c674c170b7b564908de5347e95
 const inputElement = document.querySelector(".search__input");
 const form = document.querySelector("form");
 const mainPhotoContainer = document.querySelector(".photo");
+const bodyContainer = document.querySelector("body");
 const thumbContainer = document.querySelector(".thumbs");
 const weatherDescription = document.querySelector("#conditions")
 const credit = document.querySelector("#credit-user");
@@ -38,7 +38,7 @@ function getPhotos(location, locationWeather) {
             mainPhotoContainer.innerHTML = "";
             weatherDescription.innerHTML = `WEATHER IN ${location}: ${locationWeather.split("+").join(" ")}`;          
             renderThumbs(body.results);
-            createThumbLinks(body.results);
+            createThumbLinks();
         });
 }
 
@@ -47,24 +47,21 @@ function renderThumbs(resultsArray) {
     let hmtlOutput = "";
     resultsArray.forEach((result, index) => {
         let thumbClass = index === 0 ? `thumb active` : `thumb`;
-        hmtlOutput += `<div><img class="${thumbClass}" src="${result.urls.regular}" title="${result.description}"></div>`;
+        let user = resultsArray[index].user;
+        hmtlOutput += `<div><img class="${thumbClass}" src="${result.urls.regular}" longDesc="${user.links.html}" name="${user.first_name} ${user.last_name}" title="${result.description}"></div>`;
     });
     thumbContainer.innerHTML = hmtlOutput;
 }
 
-function createThumbLinks(resultsArray) {
-    const thumbLinks = document.querySelectorAll(".thumb");
-    thumbLinks.forEach((thumbImage, counter) => {
-        let user = resultsArray[counter].user
-        thumbImage.name = `${user.first_name} ${user.last_name}`;
-        thumbImage.longDesc = user.links.html;
-        thumbImage.addEventListener("click", function (event) {
+function createThumbLinks() {
+    bodyContainer.addEventListener('click', event => {
+        if (event.target.matches('.thumb')){
+            credit.innerHTML = `<a href="${event.target.longDesc}" target="_blank">${event.target.name}</a>`;
             mainPhotoContainer.innerHTML = `<img src="${event.target.src}">`;
-            credit.innerHTML = `<a href="${thumbImage.longDesc}" target="_blank">${thumbImage.name}</a>`;
             setActiveButton(event);
-        })
-    })
-    thumbLinks[0].click();
+        }
+    });
+    document.querySelector(".active").click();
 }
 
 function setActiveButton (event){
